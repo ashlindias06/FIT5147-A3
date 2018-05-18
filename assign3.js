@@ -3,19 +3,24 @@
 function initialize() {
 
     d3.json('data.json', function (data) {
+        var scaledAmount = 60;
         var nodes = data['nodes'];
         var links = data['links'];
         var nodeRadius = new Array();
+        var nodeConnections = new Array();
         var tradingLines = new Array();
 
         nodes.forEach(function (node, j) {
             var total_node_amount = 0;
+            var count_connection = 0;
             links.forEach(function (link, i) {
                 if (nodes[j].id == links[i].node01 || nodes[j].id == links[i].node02) {
                     total_node_amount += links[i].amount;
+                    count_connection += 1;
                 }
             });
-            nodeRadius[nodes[j].id] = (total_node_amount / 100);//scaled down to %
+            nodeRadius[nodes[j].id] = (total_node_amount / scaledAmount);//scaled down to %
+            nodeConnections[nodes[j].id] = count_connection;
         });
 
         links.forEach(function (link, i) {
@@ -25,8 +30,6 @@ function initialize() {
             line['amount'] = link.amount;
             tradingLines.push(line);
         });
-
-        console.log(tradingLines);
 
         function getNodePosition(site) {
             var sitedetails = new Array();
@@ -66,7 +69,7 @@ function initialize() {
             })
             .attr('stroke','#004fff')
             .attr('stroke-width',function(d){
-                return (d.amount/100);
+                return (d.amount/scaledAmount);
             })
             .attr('class',function(d){
                 return d.node01.id+" "+d.node02.id;
@@ -92,14 +95,15 @@ function initialize() {
                 canvas.selectAll('line')
                     .attr('opacity', '0.1');
                 d3.select(this)
-                    .attr('opacity', '1');
+                    .attr('opacity', '1')
+                    .attr('stroke','red');
                 canvas.selectAll('.'+classname)
                     .attr('opacity','1')
                     .attr('stroke','red');
                 div.transition()
                     .duration(100)
                     .style("opacity", 1);
-                div.html(d.id + "<br> Trade Amount:" + (nodeRadius[d.id] * 100))
+                div.html("<b>"+(d.id).toUpperCase() + "</b><br><b> Trade amount:</b>" + (nodeRadius[d.id] * scaledAmount)+"<br><b>Total Connections:</b>"+nodeConnections[d.id])
                     .style("left", (d3.event.pageX) + "px")
                     .style("top", (d3.event.pageY - 28) + "px");
             })
@@ -108,6 +112,8 @@ function initialize() {
                 canvas.selectAll('.'+classname)
                     .attr('opacity','1')
                     .attr('stroke','#004fff');
+                d3.select(this)
+                    .attr('stroke','');
                 canvas.selectAll('circle,line')
                     .attr('opacity', '1');
                 div.transition()

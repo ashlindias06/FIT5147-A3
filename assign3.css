@@ -13,20 +13,13 @@ html, body{
 }
 
 #graphContainer circle{
-    stroke: #004fff;
     stroke-width: 2;
     fill: #00a4ff;
-}
-
-#graphContainer line{
-    /*stroke: #004fff;*/
 }
 
 div.tooltip {
     position: fixed;
     text-align: center;
-    /*width: 200px;*/
-    /*height: 28px;*/
     padding: 2px;
     font: 12px sans-serif;
     background: #f9f700;
